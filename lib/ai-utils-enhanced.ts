@@ -2,7 +2,6 @@ import { generateText, generateObject } from 'ai';
 import { z } from 'zod';
 import { Company, BrandPrompt, AIResponse, CompanyRanking, CompetitorRanking, ProviderSpecificRanking, ProviderComparisonData, ProgressCallback, CompetitorFoundData } from './types';
 import { getProviderModel, normalizeProviderName, isProviderConfigured, getProviderConfig, PROVIDER_CONFIGS } from './provider-config';
-import { analyzeWithAnthropicWebSearch } from './anthropic-web-search';
 
 const RankingSchema = z.object({
   rankings: z.array(z.object({

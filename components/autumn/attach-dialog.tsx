@@ -102,21 +102,34 @@ export default function AttachDialog(params?: AttachDialogProps) {
             onClick={async () => {
               setLoading(true);
               try {
+                // await attach({
+                //   productId: preview.product_id,
+                //   options: optionsInput.map((option) => ({
+                //     featureId: option.feature_id,
+                //     quantity: option.quantity || 0,
+                //   })),
+                //   returnUrl: window.location.origin + '/dashboard',
+                //   successUrl: window.location.origin + '/dashboard',
+                //   cancelUrl: window.location.origin + '/plans',
+                // });
                 await attach({
                   productId: preview.product_id,
                   options: optionsInput.map((option) => ({
                     featureId: option.feature_id,
                     quantity: option.quantity || 0,
                   })),
-                  returnUrl: window.location.origin + '/dashboard',
-                  successUrl: window.location.origin + '/dashboard',
-                  cancelUrl: window.location.origin + '/plans',
+                  checkoutSessionParams: {
+                    return_url: window.location.origin + '/dashboard',
+                    success_url: window.location.origin + '/dashboard',
+                    cancel_url: window.location.origin + '/plans',
+                  },
                 });
+
                 setOpen(false);
-                
+
                 // Refresh customer data to update credits in navbar
                 await refetch();
-                
+
                 // Show success message based on scenario
                 if (preview.scenario === 'downgrade') {
                   alert(`Downgrade scheduled! Your plan will change to ${preview.product_name} on ${new Date(preview.next_cycle_at!).toLocaleDateString()}.`);

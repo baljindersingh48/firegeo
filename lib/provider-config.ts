@@ -16,7 +16,6 @@ import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
 import { google } from '@ai-sdk/google';
 import { perplexity } from '@ai-sdk/perplexity';
-import { LanguageModelV1 } from 'ai';
 
 export interface ProviderModel {
   id: string;
@@ -43,7 +42,7 @@ export interface ProviderConfig {
   models: ProviderModel[];
   defaultModel: string;
   capabilities: ProviderCapabilities;
-  getModel: (modelId?: string, options?: any) => LanguageModelV1 | null;
+  getModel: (modelId?: string, options?: any) => any;
   isConfigured: () => boolean;
   enabled: boolean; // New field to control provider availability
 }
@@ -293,7 +292,7 @@ export function getProviderModel(
   providerId: string,
   modelId?: string,
   options?: any
-): LanguageModelV1 | null {
+): any {
   const provider = getProviderConfig(providerId);
   if (!provider || !provider.enabled || !provider.isConfigured()) {
     return null;

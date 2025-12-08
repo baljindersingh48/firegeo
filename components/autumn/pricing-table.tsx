@@ -76,13 +76,23 @@ export default function PricingTable({
 
                 onClick: async () => {
                   if (product.id) {
+                    // await attach({
+                    //   productId: product.id,
+                    //   dialog: AttachDialog,
+                    //   returnUrl: window.location.origin + '/dashboard',
+                    //   successUrl: window.location.origin + '/dashboard',
+                    //   cancelUrl: window.location.origin + '/pricing',
+                    // });
                     await attach({
                       productId: product.id,
                       dialog: AttachDialog,
-                      returnUrl: window.location.origin + '/dashboard',
-                      successUrl: window.location.origin + '/dashboard',
-                      cancelUrl: window.location.origin + '/pricing',
+                      checkoutSessionParams: {
+                        return_url: window.location.origin + '/dashboard',
+                        success_url: window.location.origin + '/dashboard',
+                        cancel_url: window.location.origin + '/pricing',
+                      },
                     });
+
                   } else if (product.display?.button_url) {
                     window.open(product.display?.button_url, "_blank");
                   }
@@ -103,7 +113,7 @@ const PricingTableContext = createContext<{
   showFeatures: boolean;
 }>({
   isAnnualToggle: false,
-  setIsAnnualToggle: () => {},
+  setIsAnnualToggle: () => { },
   products: [],
   showFeatures: true,
 });
@@ -206,8 +216,8 @@ export const PricingCard = ({
   const isRecommended = productDisplay?.recommend_text ? true : false;
   const mainPriceDisplay = product.properties?.is_free
     ? {
-        primary_text: "Free",
-      }
+      primary_text: "Free",
+    }
     : product.items[0].display;
 
   const featureItems = product.properties?.is_free
@@ -219,7 +229,7 @@ export const PricingCard = ({
       className={cn(
         " w-full h-full py-6 text-foreground border rounded-lg shadow-sm max-w-xl",
         isRecommended &&
-          "lg:-translate-y-6 lg:shadow-lg dark:shadow-zinc-800/80 lg:h-[calc(100%+48px)] bg-secondary/40",
+        "lg:-translate-y-6 lg:shadow-lg dark:shadow-zinc-800/80 lg:h-[calc(100%+48px)] bg-secondary/40",
         className
       )}
     >

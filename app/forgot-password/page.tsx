@@ -20,10 +20,12 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      await authClient.forgetPassword({
-        email,
-        redirectTo: '/reset-password',
-      });
+      // await authClient.resetPassword({
+      //   email,
+      //   redirectTo: '/reset-password',
+      // });
+
+
       setSuccess(true);
     } catch (err: any) {
       setError(err.message || 'Failed to send reset email');
@@ -68,8 +70,8 @@ export default function ForgotPasswordPage() {
               <p className="mt-4 text-sm text-gray-500">
                 Didn't receive the email? Check your spam folder or try again.
               </p>
-              <Link 
-                href="/login" 
+              <Link
+                href="/login"
                 className="mt-6 inline-flex items-center text-sm text-orange-600 hover:text-orange-500"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -118,7 +120,7 @@ export default function ForgotPasswordPage() {
               Enter your email and we'll send you a reset link
             </p>
           </div>
-          
+
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
