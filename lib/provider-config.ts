@@ -207,9 +207,11 @@ export const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
     },
     getModel: (modelId?: string, options?: any) => {
       if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) return null;
-      return google(modelId || PROVIDER_CONFIGS.google.defaultModel, {
-        useSearchGrounding: options?.useWebSearch || false,
-      });
+      // return google(modelId || PROVIDER_CONFIGS.google.defaultModel, {
+      //   useSearchGrounding: options?.useWebSearch || false,
+      // });
+      return google(modelId || PROVIDER_CONFIGS.google.defaultModel);
+
     },
     isConfigured: () => !!process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   },
