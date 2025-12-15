@@ -22,13 +22,13 @@ import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 const config: Config = {
+  dialect: 'postgresql',
   schema: './lib/db/schema.ts',
   out: './drizzle-generated',
-  // dbCredentials: {
-  //   url: process.env.DATABASE_URL!,
-  // },
+
   // Exclude Better Auth tables from migrations
   tablesFilter: ['!user', '!session', '!account', '!verification'],
 };
 
 export default config;
+
