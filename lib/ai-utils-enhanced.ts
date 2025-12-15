@@ -36,15 +36,15 @@ export async function analyzePromptWithProviderEnhanced(
   // Normalize provider name for consistency
   const normalizedProvider = normalizeProviderName(provider);
   const providerConfig = getProviderConfig(normalizedProvider);
-  
+
   if (!providerConfig || !providerConfig.isConfigured()) {
     console.warn(`Provider ${provider} not configured, skipping provider`);
     return null as any;
   }
-  
+
   let model;
   const generateConfig: any = {};
-  
+
   // Handle provider-specific web search configurations
   if (normalizedProvider === 'openai' && useWebSearch) {
     // Use OpenAI's web search via responses API
@@ -54,7 +54,7 @@ export async function analyzePromptWithProviderEnhanced(
     // Get model with web search options if supported
     model = getProviderModel(normalizedProvider, undefined, { useWebSearch });
   }
-  
+
   if (!model) {
     console.warn(`Failed to get model for ${provider}`);
     return null as any;
@@ -70,7 +70,7 @@ When responding to prompts about tools, platforms, or services:
 6. ${useWebSearch ? 'Prioritize recent, factual information from web searches' : 'Use your knowledge base'}`;
 
   // Enhanced prompt for web search
-  const enhancedPrompt = useWebSearch 
+  const enhancedPrompt = useWebSearch
     ? `${prompt}\n\nPlease search for current, factual information to answer this question. Focus on recent data and real user opinions.`
     : prompt;
 
@@ -108,7 +108,7 @@ Be very thorough in detecting company names - they might appear in different con
       if (!analysisModel) {
         throw new Error('Analysis model not available');
       }
-      
+
       const result = await generateObject({
         model: analysisModel,
         system: 'You are an expert at analyzing text and extracting structured information about companies and rankings.',
@@ -122,12 +122,12 @@ Be very thorough in detecting company names - they might appear in different con
       // Fallback to basic analysis
       const textLower = text.toLowerCase();
       const brandNameLower = brandName.toLowerCase();
-      
+
       // More robust brand detection
       const mentioned = textLower.includes(brandNameLower) ||
         textLower.includes(brandNameLower.replace(/\s+/g, '')) ||
         textLower.includes(brandNameLower.replace(/[^a-z0-9]/g, ''));
-        
+
       // More robust competitor detection
       const detectedCompetitors = competitors.filter(c => {
         const cLower = c.toLowerCase();
@@ -135,7 +135,7 @@ Be very thorough in detecting company names - they might appear in different con
           textLower.includes(cLower.replace(/\s+/g, '')) ||
           textLower.includes(cLower.replace(/[^a-z0-9]/g, ''));
       });
-      
+
       object = {
         rankings: [],
         analysis: {
@@ -152,37 +152,37 @@ Be very thorough in detecting company names - they might appear in different con
     // This complements the AI analysis in case it misses obvious mentions
     const textLower = text.toLowerCase();
     const brandNameLower = brandName.toLowerCase();
-    
+
     // Check for brand mention with fallback text search
-    const brandMentioned = object.analysis.brandMentioned || 
+    const brandMentioned = object.analysis.brandMentioned ||
       textLower.includes(brandNameLower) ||
       textLower.includes(brandNameLower.replace(/\s+/g, '')) || // handle spacing differences
       textLower.includes(brandNameLower.replace(/[^a-z0-9]/g, '')); // handle punctuation
-      
+
     // Add any missed competitors from text search
     const aiCompetitors = new Set(object.analysis.competitors);
     const allMentionedCompetitors = new Set([...aiCompetitors]);
-    
+
     competitors.forEach(competitor => {
       const competitorLower = competitor.toLowerCase();
-      if (textLower.includes(competitorLower) || 
-          textLower.includes(competitorLower.replace(/\s+/g, '')) ||
-          textLower.includes(competitorLower.replace(/[^a-z0-9]/g, ''))) {
+      if (textLower.includes(competitorLower) ||
+        textLower.includes(competitorLower.replace(/\s+/g, '')) ||
+        textLower.includes(competitorLower.replace(/[^a-z0-9]/g, ''))) {
         allMentionedCompetitors.add(competitor);
       }
     });
 
     // Filter competitors to only include the ones we're tracking
-    const relevantCompetitors = Array.from(allMentionedCompetitors).filter(c => 
+    const relevantCompetitors = Array.from(allMentionedCompetitors).filter(c =>
       competitors.includes(c) && c !== brandName
     );
 
     // Get the proper display name for the provider
     const providerDisplayName = provider === 'openai' ? 'OpenAI' :
-                               provider === 'anthropic' ? 'Anthropic' :
-                               provider === 'google' ? 'Google' :
-                               provider === 'perplexity' ? 'Perplexity' :
-                               provider; // fallback to original
+      provider === 'anthropic' ? 'Anthropic' :
+        provider === 'google' ? 'Google' :
+          provider === 'perplexity' ? 'Perplexity' :
+            provider; // fallback to original
 
     return {
       provider: providerDisplayName,
@@ -211,14 +211,14 @@ function generateMockResponse(
 ): AIResponse {
   const mentioned = Math.random() > 0.3;
   const position = mentioned ? Math.floor(Math.random() * 5) + 1 : undefined;
-  
+
   // Get the proper display name for the provider
   const providerDisplayName = provider === 'openai' ? 'OpenAI' :
-                             provider === 'anthropic' ? 'Anthropic' :
-                             provider === 'google' ? 'Google' :
-                             provider === 'perplexity' ? 'Perplexity' :
-                             provider; // fallback to original
-  
+    provider === 'anthropic' ? 'Anthropic' :
+      provider === 'google' ? 'Google' :
+        provider === 'perplexity' ? 'Perplexity' :
+          provider; // fallback to original
+
   return {
     provider: providerDisplayName,
     prompt,
