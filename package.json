@@ -4,7 +4,7 @@
   "private": true,
   "overrides": {
     "better-call": {
-      "zod": "^3.23.8"
+      "zod": "^4.0.0"
     }
   },
   "scripts": {
