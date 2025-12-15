@@ -14,13 +14,13 @@ function DashboardContent({ session }: { session: any }) {
   const { customer, attach } = useCustomer();
   const { products } = usePricingTable();
   const [loadingProductId, setLoadingProductId] = useState<string | null>(null);
-  
+
   // Profile and settings hooks
   const { data: profileData } = useProfile();
   const updateProfile = useUpdateProfile();
   const { data: settings } = useSettings();
   const updateSettings = useUpdateSettings();
-  
+
   // Profile edit state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -62,24 +62,32 @@ function DashboardContent({ session }: { session: any }) {
   // Get current user's products and features
   const userProducts = customer?.products || [];
   const userFeatures = customer?.features || {};
-  
+
   // Find the actual active product (not scheduled)
-  const activeProduct = userProducts.find(p => 
+  const activeProduct = userProducts.find(p =>
     p.status === 'active' || p.status === 'trialing' || p.status === 'past_due'
   );
-  const scheduledProduct = userProducts.find(p => 
+  const scheduledProduct = userProducts.find(p =>
     p.status === 'scheduled' || (p.started_at && new Date(p.started_at) > new Date())
   );
 
   const handleUpgrade = async (productId: string) => {
     try {
       setLoadingProductId(productId);
+      // await attach({
+      //   productId,
+      //   dialog: ProductChangeDialog,
+      //   returnUrl: window.location.origin + '/dashboard',
+      //   successUrl: window.location.origin + '/dashboard',
+      //   cancelUrl: window.location.origin + '/dashboard',
+      // });
       await attach({
         productId,
         dialog: ProductChangeDialog,
-        returnUrl: window.location.origin + '/dashboard',
-        successUrl: window.location.origin + '/dashboard',
-        cancelUrl: window.location.origin + '/dashboard',
+        checkoutSessionParams: {
+          success_url: window.location.origin + '/dashboard',
+          cancel_url: window.location.origin + '/dashboard',
+        },
       });
     } finally {
       setLoadingProductId(null);
@@ -127,7 +135,7 @@ function DashboardContent({ session }: { session: any }) {
               </div>
             )}
           </div>
-          
+
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -136,7 +144,7 @@ function DashboardContent({ session }: { session: any }) {
               </label>
               <p className="text-gray-900">{session.user?.email}</p>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <User className="inline-block h-4 w-4 mr-1" />
@@ -156,7 +164,7 @@ function DashboardContent({ session }: { session: any }) {
                 </p>
               )}
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <Phone className="inline-block h-4 w-4 mr-1" />
@@ -176,7 +184,7 @@ function DashboardContent({ session }: { session: any }) {
                 </p>
               )}
             </div>
-            
+
             <div className="md:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Bio
@@ -209,19 +217,17 @@ function DashboardContent({ session }: { session: any }) {
               </div>
               <button
                 onClick={() => handleSettingToggle('emailNotifications', !settings?.emailNotifications)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings?.emailNotifications ? 'bg-orange-500' : 'bg-gray-200'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings?.emailNotifications ? 'bg-orange-500' : 'bg-gray-200'
+                  }`}
                 disabled={updateSettings.isPending}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings?.emailNotifications ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings?.emailNotifications ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
               </button>
             </div>
-            
+
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium">Marketing Emails</p>
@@ -229,15 +235,13 @@ function DashboardContent({ session }: { session: any }) {
               </div>
               <button
                 onClick={() => handleSettingToggle('marketingEmails', !settings?.marketingEmails)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  settings?.marketingEmails ? 'bg-orange-500' : 'bg-gray-200'
-                }`}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings?.marketingEmails ? 'bg-orange-500' : 'bg-gray-200'
+                  }`}
                 disabled={updateSettings.isPending}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    settings?.marketingEmails ? 'translate-x-6' : 'translate-x-1'
-                  }`}
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${settings?.marketingEmails ? 'translate-x-6' : 'translate-x-1'
+                    }`}
                 />
               </button>
             </div>
@@ -260,9 +264,17 @@ function DashboardContent({ session }: { session: any }) {
                     <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
                     {activeProduct.name || activeProduct.id}
                     {scheduledProduct && (
+                      // <span className="ml-2 text-sm text-gray-500">
+                      //   (Changing to {scheduledProduct.name || scheduledProduct.id} on {new Date(scheduledProduct.started_at || scheduledProduct.current_period_end).toLocaleDateString()})
+                      // </span>
                       <span className="ml-2 text-sm text-gray-500">
-                        (Changing to {scheduledProduct.name || scheduledProduct.id} on {new Date(scheduledProduct.started_at || scheduledProduct.current_period_end).toLocaleDateString()})
+                        {(() => {
+                          const dateValue = scheduledProduct.started_at ?? scheduledProduct.current_period_end;
+                          const formattedDate = dateValue ? new Date(dateValue).toLocaleDateString() : 'N/A';
+                          return `(Changing to ${scheduledProduct.name || scheduledProduct.id} on ${formattedDate})`;
+                        })()}
                       </span>
+
                     )}
                   </>
                 ) : (
@@ -287,13 +299,13 @@ function DashboardContent({ session }: { session: any }) {
                     <h3 className="font-medium mb-2 capitalize">{featureId.replace(/_/g, ' ')}</h3>
                     <div className="flex justify-between text-sm mb-1">
                       <span>Used</span>
-                      <span>{feature.usage || 0} / {feature.included_usage || feature.balance + (feature.usage || 0)}</span>
+                      <span>{feature.usage || 0} / {feature.included_usage || (feature.balance ?? 0) + (feature.usage || 0)}</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
                         className="bg-orange-500 h-2 rounded-full transition-all"
                         style={{
-                          width: `${Math.min(((feature.usage || 0) / (feature.included_usage || feature.balance + (feature.usage || 0) || 1)) * 100, 100)}%`
+                          width: `${Math.min(((feature.usage || 0) / (feature.included_usage || (feature.balance ?? 0) + (feature.usage || 0) || 1)) * 100, 100)}%`
                         }}
                       />
                     </div>
@@ -324,7 +336,7 @@ function DashboardContent({ session }: { session: any }) {
                 const isCurrentPlan = activeProduct?.id === product.id;
                 const isScheduledPlan = scheduledProduct?.id === product.id;
                 const features = product.properties?.is_free ? product.items : product.items?.slice(1) || [];
-                
+
                 return (
                   <div key={product.id} className="border rounded-lg p-4">
                     <div className="flex justify-between items-start">
@@ -357,8 +369,8 @@ function DashboardContent({ session }: { session: any }) {
                         </ul>
                       </div>
                       {!isCurrentPlan && !isScheduledPlan && (
-                        <Button 
-                          onClick={() => handleUpgrade(product.id)} 
+                        <Button
+                          onClick={() => handleUpgrade(product.id)}
                           size="sm"
                           variant="outline"
                           disabled={loadingProductId !== null}
@@ -374,9 +386,17 @@ function DashboardContent({ session }: { session: any }) {
                         </Button>
                       )}
                       {isScheduledPlan && (
+                        // <span className="text-sm text-gray-500">
+                        //   Starts {new Date(scheduledProduct.started_at || scheduledProduct.current_period_end).toLocaleDateString()}
+                        // </span>
                         <span className="text-sm text-gray-500">
-                          Starts {new Date(scheduledProduct.started_at || scheduledProduct.current_period_end).toLocaleDateString()}
+                          {(() => {
+                            const dateValue = scheduledProduct.started_at ?? scheduledProduct.current_period_end;
+                            const formattedDate = dateValue != null ? new Date(dateValue).toLocaleDateString() : 'N/A';
+                            return `Starts ${formattedDate}`;
+                          })()}
                         </span>
+
                       )}
                     </div>
                   </div>

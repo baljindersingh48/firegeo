@@ -51,14 +51,15 @@
 
 
 // middleware.ts
+// proxy.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getSessionCookie } from 'better-auth/cookies';
 
-export const runtime = 'nodejs'; // <--- Add this line at the top
+// export const runtime = 'nodejs';
 
 const protectedRoutes = ['/dashboard', '/chat', '/brand-monitor'];
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   const isProtectedRoute = protectedRoutes.some(route =>
@@ -84,9 +85,6 @@ export async function middleware(request: NextRequest) {
 
   return response;
 }
+// REMOVE this completely
+// export const config = { matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).)'], };
 
-export const config = {
-  matcher: [
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).)',
-  ],
-};
